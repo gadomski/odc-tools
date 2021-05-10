@@ -78,7 +78,13 @@ Statistician has multiple different execution modes:
 A sample command to run a single task:
 
 ```
-odc-stats run ga_ls8c_ard_3_all.db  2015--P1Y/41/13 --threads=16 --memory-limit=60Gi --resolution=30 --config cfg.yaml --location file:///localpath/
+odc-stats run ga_ls8c_ard_3_all.db \
+ 2015--P1Y/41/13 \
+ --config cfg.yaml \
+ --resolution=30 \
+ --location file:///localpath/ \
+ --threads=16 \
+ --memory-limit=60Gi
 ```
 
 ```
@@ -138,6 +144,16 @@ cog_opts:
 
 Note that configurations will vary between different products. See this [sample configuration for Australian Landsat-8](https://bitbucket.org/geoscienceaustralia/datakube-apps/src/develop/workspaces/dea-dev/processing/06_stats.yaml).
 
+It is also possible to define custom plugins outside of `odc.stats.*`. To do that, define class deriving from `odc.stats.model.StatsPluginInterface` and implement `.input_data` and `.reduce` methods. You can then specify fully qualified name of your custom plugin in `cfg.yaml`.
+
+```yaml
+plugin: mycustomlib.SomePluginOfMine
+plugin_config:
+   param1: 100
+   param2: "string param"
+   # ...
+```
+
 ## Orchestration
 
 > :warning: **This documentation section references some private configuration**
@@ -154,7 +170,7 @@ Note that each queue will have a corresponding dead letter queue.
 
 The user and the queue will be created using a Terraform module which contains code similar to the following:
 
-```
+```terraform
 module "odc_stats_geomedian" {
 
   source = "../../../modules/statistician"
